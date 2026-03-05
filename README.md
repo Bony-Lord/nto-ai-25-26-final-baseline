@@ -1,55 +1,41 @@
-# Baseline Pipeline (ADR-001)
+# Baseline Pipeline
 
-Бейзлайн реализован как модульный офлайн-пайплайн из 5 стадий:
-`prepare_data -> build_features -> generate_candidates -> rank_and_select -> make_submission`.
+Репозиторий содержит воспроизводимый baseline для кейса «Потеряшки»:  
+из входных CSV формируется валидный `submission.csv` для `NDCG@20`.
 
-## Данные
+## TL;DR
 
-Ожидаемая структура `data/`:
+- Пайплайн состоит из 5 стадий: `prepare_data -> build_features -> generate_candidates -> rank_and_select -> make_submission`.
+- На выходе создается `artifacts/submission.csv`.
+- Поддерживается перезапуск по стадиям и кэширование шагов через fingerprint входов.
+- Прогресс выполнения виден в stdout и в лог-файле текущего запуска.
 
-```text
-data/
-  interactions.csv
-  targets.csv
-  editions.csv
-  authors.csv
-  genres.csv
-  book_genres.csv
-  users.csv
-```
+## Быстрый старт
 
-## Запуск (сценарий 1)
+1. Подготовьте данные в `data/` (см. [`SETUP.md`](SETUP.md)).
+2. Запустите полный пайплайн:
+   `uv run python -m src.cli run --config configs/base.yaml`
+3. Проверьте результат: `artifacts/submission.csv`.
 
-```bash
-uv run python -m src.cli run --config configs/base.yaml
-```
+## Что читать дальше
 
-Результат:
-- создаются артефакты в `artifacts/`
-- итоговый файл `artifacts/submission.csv`
+- **Как запускать и дебажить**: [`SETUP.md`](SETUP.md)
+- **Как дорабатывать baseline под себя**: [`ONBOARDING.md`](ONBOARDING.md)
 
-## Перезапуск конкретного шага (сценарий 2)
+## Что в репозитории важно
 
-```bash
-uv run python -m src.cli run --config configs/base.yaml --stage generate_candidates
-```
+- `src/pipeline.py` — оркестрация стадий.
+- `src/candidates/` — генераторы кандидатов (главная зона для улучшений).
+- `src/ranking/simple_blend.py` — простое объединение источников.
+- `configs/base.yaml` — ключевые параметры запуска и генераторов.
 
-Поведение:
-- будут выполнены зависимости выбранной стадии
-- готовые стадии с совпадающим fingerprint пропускаются
+## Что лучше не трогать и не тратить время
 
-## Локальная валидация (сценарий 3)
+- Не переписывайте логику кэширования и атомарной записи в `src/core/artifacts.py` и `src/io/hashing.py` без реальной необходимости.
+- Не меняйте контракт итогового сабмита в `src/core/validate.py`: это зона, где проще всего случайно сломать отправку.
+- Не начинайте с рефакторинга всего `src/pipeline.py`: быстрее и эффективнее улучшать генераторы в `src/candidates/` и параметры в `configs/base.yaml`.
+- Не тратьте время на сложный ML “с нуля” в самом начале: сначала выжмите максимум из candidate generation + blending/weights.
 
-```bash
-uv run python -m src.cli validate --config configs/base.yaml
-```
+## Что делать дальше
 
-Вывод:
-- `mean_ndcg@20`
-- квантили (`q25`, `q50`, `q75`)
-
-## Примечания
-
-- Логи запуска пишутся в `logs/`.
-- Метаданные кэша шагов пишутся в `artifacts/_meta/`.
-- При любой записи артефактов используется атомарный `os.replace`.
+Перейдите в [`SETUP.md`](SETUP.md) и выполните команды запуска из раздела «Быстрый запуск».
