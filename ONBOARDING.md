@@ -4,22 +4,22 @@
 
 ## 1) Карта baseline
 
-- `src/pipeline/orchestrator.py` — оркестрация 5 стадий, кэширование, запуск `run/validate`.
-- `src/pipeline/stages/` — отдельные классы стадий (`PrepareDataStage`, `BuildFeaturesStage`, `GenerateCandidatesStage`, `RankAndSelectStage`, `MakeSubmissionStage`).
-- `src/pipeline/stage_helpers.py` — общий код для стадий (кэш, фичи, генераторы, ранжирование).
+- `src/participants/` — главная зона участника (features/generators/ranking/validation).
+- `src/candidates/` — реализации генераторов кандидатов.
+- `configs/experiments/` — конфиги экспериментов.
+- `src/pipeline/orchestrator.py` и `src/pipeline/stages/` — техническая оркестрация.
 - `src/pipeline/workflows/local_validation.py` — `PseudoIncidentValidationWorkflow`.
-- `src/candidates/` — генераторы кандидатов. Главная зона для экспериментов.
-- `src/ranking/simple_blend.py` — объединение источников и top-k.
 - `src/core/validate.py` — строгая проверка формата `submission.csv`.
-- `configs/base.yaml` — параметры пайплайна и список генераторов.
+- `configs/system.yaml` — системные параметры (пути, логи).
 - `tests/` — минимальные тесты контрактов и smoke-сценарий.
 
 ## 2) Что менять в первую очередь (high impact)
 
 1. **Новые генераторы кандидатов** в `src/candidates/`.
-2. **Параметры генераторов** в `configs/base.yaml`.
-3. **Весы источников** в `ranking.source_weights`.
-4. **Ширина кандидатов**: `candidates.per_generator_k`.
+2. **Регистрация генераторов** в `src/participants/generators/registry.py`.
+3. **Параметры эксперимента** в `configs/experiments/*.yaml`.
+4. **Весы источников** в `ranking.source_weights`.
+5. **Ширина кандидатов**: `candidates.per_generator_k`.
 
 Это обычно дает лучший прирост качества при минимальном риске сломать пайплайн.
 
@@ -67,16 +67,17 @@ class MyGenerator:
 
 ### Шаг 2. Зарегистрировать генератор
 
-Добавить его в фабрику `src/candidates/__init__.py`:
+Добавить его в реестр `src/participants/generators/registry.py`:
 
 ```python
-if name == "my_generator":
-    return MyGenerator(alpha=float(params.get("alpha", 1.0)))
+GENERATOR_REGISTRY["my_generator"] = (
+    lambda params, tqdm_enabled: MyGenerator(alpha=float(params.get("alpha", 1.0)))
+)
 ```
 
 ### Шаг 3. Подключить в конфиг
 
-В `configs/base.yaml`:
+В `configs/experiments/<your_exp>.yaml`:
 
 ```yaml
 candidates:
@@ -97,7 +98,7 @@ candidates:
 ### Шаг 5. Прогнать тесты и запуск
 
 - `uv run pytest -q`
-- `uv run python -m src.cli run --config configs/base.yaml --stage generate_candidates`
+- `uv run python -m src.cli run --config configs/experiments/<your_exp>.yaml --stage generate_candidates`
 
 ## 5) Быстрый checklist перед экспериментом
 
@@ -115,4 +116,4 @@ candidates:
 
 ## Что делать дальше
 
-Вернитесь в [`README.md`](README.md) как в навигационную точку и фиксируйте лучшие конфиги в `configs/base.yaml`.
+Вернитесь в [`README.md`](README.md) как в навигационную точку и фиксируйте лучшие конфиги в `configs/experiments/`.

@@ -12,15 +12,16 @@ from tqdm import tqdm
 from src.core.dataset import Dataset
 from src.core.metrics import ndcg_at_k, summarize_ndcg
 from src.pipeline.models import PipelineContext
-from src.pipeline.stage_helpers import StageHelpers
+from src.participants.features import build_features_frame
+from src.participants.generators import run_generators
+from src.participants.ranking import rank_predictions
 
 
 class PseudoIncidentValidationWorkflow:
     """Runs local validation loop on pseudo-incident split."""
 
-    def __init__(self, context: PipelineContext, helpers: StageHelpers) -> None:
+    def __init__(self, context: PipelineContext) -> None:
         self.context = context
-        self.helpers = helpers
 
     def run(self) -> dict[str, Any]:
         """Run pseudo-incident validation in clean period and report NDCG@20."""
@@ -61,10 +62,28 @@ class PseudoIncidentValidationWorkflow:
             seen_positive_df=observed[["user_id", "edition_id"]].drop_duplicates(),
         )
 
-        features = self.helpers.build_features_frame(validation_dataset)
+        features = build_features_frame(
+            dataset=validation_dataset,
+            recent_days=int(self.context.config["pipeline"]["recent_days"]),
+        )
         user_ids = validation_dataset.targets_df["user_id"].drop_duplicates().astype("int64")
-        candidates = self.helpers.run_generators(validation_dataset, features, user_ids)
-        predictions = self.helpers.rank_predictions(validation_dataset, candidates)
+        logs_cfg = self.context.config.get("logs", {})
+        tqdm_enabled = bool(logs_cfg.get("tqdm_enabled", True)) and sys.stdout.isatty()
+        candidates = run_generators(
+            dataset=validation_dataset,
+            features=features,
+            user_ids=user_ids,
+            generators_cfg=list(self.context.config["candidates"]["generators"]),
+            per_generator_k=int(self.context.config["candidates"]["per_generator_k"]),
+            seed=int(self.context.config["pipeline"]["seed"]),
+            tqdm_enabled=tqdm_enabled,
+        )
+        predictions = rank_predictions(
+            dataset=validation_dataset,
+            candidates=candidates,
+            source_weights=self.context.config.get("ranking", {}).get("source_weights", {}),
+            k=int(self.context.config["pipeline"]["k"]),
+        )
 
         relevant_by_user: dict[int, set[int]] = {}
         for row in masked_pairs.to_dict(orient="records"):
@@ -78,7 +97,7 @@ class PseudoIncidentValidationWorkflow:
             desc="validation_users",
             leave=False,
             dynamic_ncols=True,
-            disable=not self.helpers.is_tqdm_enabled(),
+            disable=not tqdm_enabled,
             file=sys.stdout,
         ):
             user_pred = predictions[predictions["user_id"] == int(user_id)].sort_values("rank")

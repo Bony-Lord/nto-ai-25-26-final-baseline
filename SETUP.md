@@ -25,19 +25,19 @@ data/
 Полный прогон:
 
 ```bash
-uv run python -m src.cli run --config configs/base.yaml
+uv run python -m src.cli run --config configs/experiments/baseline.yaml
 ```
 
 Перезапуск с конкретной стадии (с автодогоном зависимостей):
 
 ```bash
-uv run python -m src.cli run --config configs/base.yaml --stage generate_candidates
+uv run python -m src.cli run --config configs/experiments/baseline.yaml --stage generate_candidates
 ```
 
 Локальная валидация (псевдо-инцидент):
 
 ```bash
-uv run python -m src.cli validate --config configs/base.yaml
+uv run python -m src.cli validate --config configs/experiments/baseline.yaml
 ```
 
 ## CLI: команды и опции
@@ -45,10 +45,10 @@ uv run python -m src.cli validate --config configs/base.yaml
 Точка входа: `python -m src.cli`
 
 - `run`
-  - `--config` (по умолчанию `configs/base.yaml`)
+  - `--config` (по умолчанию `configs/base.yaml`; рекомендуемый — `configs/experiments/baseline.yaml`)
   - `--stage` (`prepare_data | build_features | generate_candidates | rank_and_select | make_submission`)
 - `validate`
-  - `--config` (по умолчанию `configs/base.yaml`)
+  - `--config` (по умолчанию `configs/base.yaml`; рекомендуемый — `configs/experiments/baseline.yaml`)
 
 ## Где смотреть результаты
 

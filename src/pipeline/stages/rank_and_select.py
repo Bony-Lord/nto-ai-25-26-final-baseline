@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import pandas as pd
+from typing import Any
 
-from src.core.dataset import Dataset
-from src.pipeline.stage_helpers import StageHelpers
+from src.core.artifacts import atomic_write_dataframe
+from src.participants.ranking import rank_predictions
+from src.pipeline.models import PipelineContext
+from src.pipeline.runtime import load_runtime_dataset
 
 
 class RankAndSelectStage:
@@ -13,24 +16,19 @@ class RankAndSelectStage:
 
     name = "rank_and_select"
 
-    def __init__(self, helpers: StageHelpers) -> None:
-        self.helpers = helpers
+    def __init__(self, context: PipelineContext) -> None:
+        self.context = context
 
     def run(self) -> dict[str, Any]:
-        dataset = Dataset.load(self.helpers.paths.data_dir)
-        interactions, seen_positive = self.helpers.read_data_cache()
-        dataset = Dataset(
-            interactions_df=interactions,
-            targets_df=dataset.targets_df,
-            catalog_df=dataset.catalog_df,
-            book_genres_df=dataset.book_genres_df,
-            genres_df=dataset.genres_df,
-            users_df=dataset.users_df,
-            seen_positive_df=seen_positive,
+        dataset = load_runtime_dataset(self.context.paths)
+        candidates = pd.read_parquet(self.context.paths.candidates_path)
+        predictions = rank_predictions(
+            dataset=dataset,
+            candidates=candidates,
+            source_weights=self.context.config.get("ranking", {}).get("source_weights", {}),
+            k=int(self.context.config["pipeline"]["k"]),
         )
-        candidates = pd.read_parquet(self.helpers.paths.candidates_path)
-        predictions = self.helpers.rank_predictions(dataset, candidates)
-        self.helpers.write_dataframe(predictions, self.helpers.paths.predictions_path)
+        atomic_write_dataframe(predictions, self.context.paths.predictions_path)
         return {
             "rows": int(len(predictions)),
             "users": int(predictions["user_id"].nunique() if not predictions.empty else 0),

@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
-from src.core.dataset import Dataset
-from src.pipeline.stage_helpers import StageHelpers
+from typing import Any
+
+from src.core.artifacts import atomic_write_dataframe
+from src.pipeline.models import PipelineContext
+from src.pipeline.runtime import load_base_dataset, pack_data_cache
 
 
 class PrepareDataStage:
@@ -11,13 +14,13 @@ class PrepareDataStage:
 
     name = "prepare_data"
 
-    def __init__(self, helpers: StageHelpers) -> None:
-        self.helpers = helpers
+    def __init__(self, context: PipelineContext) -> None:
+        self.context = context
 
     def run(self) -> dict[str, Any]:
-        dataset = Dataset.load(self.helpers.paths.data_dir)
-        data_cache = self.helpers.pack_data_cache(dataset)
-        self.helpers.write_dataframe(data_cache, self.helpers.paths.data_cache_path)
+        dataset = load_base_dataset(self.context.paths)
+        data_cache = pack_data_cache(dataset)
+        atomic_write_dataframe(data_cache, self.context.paths.data_cache_path)
         return {
             "rows": int(len(data_cache)),
             "users": int(dataset.interactions_df["user_id"].nunique()),

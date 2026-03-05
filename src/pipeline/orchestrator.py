@@ -17,7 +17,6 @@ from src.pipeline.models import (
     PipelineContext,
     PipelinePaths,
 )
-from src.pipeline.stage_helpers import StageHelpers
 from src.pipeline.stages import (
     BuildFeaturesStage,
     GenerateCandidatesStage,
@@ -44,14 +43,13 @@ class PipelineRunner:
             logger=self.logger,
             artifacts=self.artifacts,
         )
-        self.helpers = StageHelpers(self.context)
-        self.validation = PseudoIncidentValidationWorkflow(self.context, self.helpers)
+        self.validation = PseudoIncidentValidationWorkflow(self.context)
         self.stage_registry: dict[str, PipelineStage] = {
-            "prepare_data": PrepareDataStage(self.helpers),
-            "build_features": BuildFeaturesStage(self.helpers),
-            "generate_candidates": GenerateCandidatesStage(self.helpers),
-            "rank_and_select": RankAndSelectStage(self.helpers),
-            "make_submission": MakeSubmissionStage(self.helpers),
+            "prepare_data": PrepareDataStage(self.context),
+            "build_features": BuildFeaturesStage(self.context),
+            "generate_candidates": GenerateCandidatesStage(self.context),
+            "rank_and_select": RankAndSelectStage(self.context),
+            "make_submission": MakeSubmissionStage(self.context),
         }
 
     @staticmethod
