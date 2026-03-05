@@ -4,7 +4,10 @@
 
 ## 1) Карта baseline
 
-- `src/pipeline.py` — оркестрация 5 стадий, кэширование, запуск `run/validate`.
+- `src/pipeline/orchestrator.py` — оркестрация 5 стадий, кэширование, запуск `run/validate`.
+- `src/pipeline/stages/` — отдельные классы стадий (`PrepareDataStage`, `BuildFeaturesStage`, `GenerateCandidatesStage`, `RankAndSelectStage`, `MakeSubmissionStage`).
+- `src/pipeline/stage_helpers.py` — общий код для стадий (кэш, фичи, генераторы, ранжирование).
+- `src/pipeline/workflows/local_validation.py` — `PseudoIncidentValidationWorkflow`.
 - `src/candidates/` — генераторы кандидатов. Главная зона для экспериментов.
 - `src/ranking/simple_blend.py` — объединение источников и top-k.
 - `src/core/validate.py` — строгая проверка формата `submission.csv`.
@@ -24,7 +27,7 @@
 
 - Механизм кэширования и атомарной записи (`src/core/artifacts.py`, `src/io/hashing.py`).
 - Контракт итогового сабмита и его валидация (`src/core/validate.py`).
-- Базовая схема стадий в `src/pipeline.py`, если нет явной причины.
+- Базовая схема оркестрации и стадий в `src/pipeline/`, если нет явной причины.
 
 Причина: эти части отвечают за стабильность и воспроизводимость baseline.
 
