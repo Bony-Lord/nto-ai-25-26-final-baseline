@@ -13,12 +13,14 @@ docs/baseline_description.md
 catboost_info/
 outputs/
 
-# Project specific
-artifacts/
-logs/
-configs/
-
 # IDEs
 .vscode/
 .idea/
 *.swp
+
+# Project specific
+artifacts/
+logs/
+configs/local*.yaml
+outputs/
+catboost_info/

@@ -19,9 +19,9 @@
 
 ## Что читать дальше
 
-- **Как запускать и дебажить**: [`SETUP.md`](SETUP.md)
-- **Как дорабатывать baseline под себя**: [`ONBOARDING.md`](ONBOARDING.md)
-- **Какие файлы участнику менять, а какие нет**: [`docs/PARTICIPANT_SURFACE.md`](docs/PARTICIPANT_SURFACE.md)
+- **[Documentation Index](docs/INDEX.md)**: Единая точка навигации по всем документам проекта.
+- **Как запускать и дебажить**: [`SETUP.md`](docs/baseline/SETUP.md)
+- **Как дорабатывать baseline под себя**: [`ONBOARDING.md`](docs/baseline/ONBOARDING.md)
 
 ## Что в репозитории важно
 
@@ -40,4 +40,4 @@
 
 ## Что делать дальше
 
-Перейдите в [`SETUP.md`](SETUP.md) и выполните команды запуска из раздела «Быстрый запуск».
+Перейдите в [`SETUP.md`](docs/baseline/SETUP.md) и выполните команды запуска из раздела «Быстрый запуск».

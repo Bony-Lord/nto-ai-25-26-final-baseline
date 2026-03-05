@@ -106,7 +106,7 @@ def _dataset() -> Dataset:
 
 
 def test_experiment_config_imports_system_layer() -> None:
-    root = Path(__file__).resolve().parents[1]
+    root = Path(__file__).resolve().parents[2]
     config = load_config(root / "configs" / "experiments" / "baseline.yaml")
     assert config["paths"]["data_dir"] == "./data"
     assert config["logs"]["tqdm_enabled"] is True

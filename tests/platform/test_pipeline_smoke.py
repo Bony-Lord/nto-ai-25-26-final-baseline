@@ -51,7 +51,7 @@ def test_pipeline_smoke(tmp_path: Path) -> None:
             "per_generator_k": 5,
             "generators": [
                 {"name": "global_popularity", "params": {}},
-                {"name": "user_genre_popularity", "params": {}},
+                {"name": "user_genre", "params": {}},
                 {"name": "user_author", "params": {}},
             ],
         },
@@ -111,7 +111,7 @@ def test_progress_metadata_and_skip_logs(tmp_path: Path) -> None:
             "per_generator_k": 5,
             "generators": [
                 {"name": "global_popularity", "params": {}},
-                {"name": "user_genre_popularity", "params": {}},
+                {"name": "user_genre", "params": {}},
                 {"name": "user_author", "params": {}},
             ],
         },

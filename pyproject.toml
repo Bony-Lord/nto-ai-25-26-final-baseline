@@ -16,3 +16,8 @@ dependencies = [
     "pytest>=8.4.2",
     "tqdm>=4.67.3",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.4",
+]

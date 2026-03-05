@@ -115,4 +115,4 @@ candidates:
 
 ## Что делать дальше
 
-Вернитесь в [`README.md`](README.md) как в навигационную точку и фиксируйте лучшие конфиги в `configs/experiments/`.
+Вернитесь к **[Documentation Index](docs/INDEX.md)** или в [`README.md`](README.md) как в навигационную точку и фиксируйте лучшие конфиги в `configs/experiments/`.

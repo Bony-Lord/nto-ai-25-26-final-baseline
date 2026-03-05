@@ -94,4 +94,4 @@ uv run python -m src.platform.cli.entrypoint validate --config configs/experimen
 
 ## Что делать дальше
 
-После первого успешного запуска переходите в [`ONBOARDING.md`](ONBOARDING.md), чтобы понять, как правильно улучшать baseline.
+После первого успешного запуска переходите к **[Documentation Index](docs/INDEX.md)** или сразу в [`ONBOARDING.md`](ONBOARDING.md), чтобы понять, как правильно улучшать baseline.

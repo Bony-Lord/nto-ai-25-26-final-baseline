@@ -32,7 +32,7 @@ def _build_user_author(params: dict[str, float], tqdm_enabled: bool) -> object:
 
 GENERATOR_REGISTRY: dict[str, GeneratorFactory] = {
     "global_popularity": _build_global_popularity,
-    "user_genre_popularity": _build_user_genre_popularity,
+    "user_genre": _build_user_genre_popularity,
     "user_author": _build_user_author,
 }
 
