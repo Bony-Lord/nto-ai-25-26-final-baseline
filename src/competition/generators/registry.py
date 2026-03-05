@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from src.competition.solution.generators.global_popularity import GlobalPopularityGenerator
-from src.competition.solution.generators.user_author import UserAuthorGenerator
-from src.competition.solution.generators.user_genre import UserGenrePopularityGenerator
+from src.competition.generators.global_popularity import GlobalPopularityGenerator
+from src.competition.generators.user_author import UserAuthorGenerator
+from src.competition.generators.user_genre import UserGenrePopularityGenerator
 
 GeneratorFactory = Callable[[dict[str, float], bool], object]
 
@@ -16,7 +16,7 @@ def _build_global_popularity(params: dict[str, float], tqdm_enabled: bool) -> ob
     return GlobalPopularityGenerator(show_progress=tqdm_enabled)
 
 
-def _build_user_genre_popularity(params: dict[str, float], tqdm_enabled: bool) -> object:
+def _build_user_genre(params: dict[str, float], tqdm_enabled: bool) -> object:
     return UserGenrePopularityGenerator(
         genre_smoothing=float(params.get("genre_smoothing", 1.0)),
         show_progress=tqdm_enabled,
@@ -32,7 +32,7 @@ def _build_user_author(params: dict[str, float], tqdm_enabled: bool) -> object:
 
 GENERATOR_REGISTRY: dict[str, GeneratorFactory] = {
     "global_popularity": _build_global_popularity,
-    "user_genre": _build_user_genre_popularity,
+    "user_genre": _build_user_genre,
     "user_author": _build_user_author,
 }
 

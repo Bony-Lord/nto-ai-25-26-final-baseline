@@ -42,6 +42,7 @@ def load_runtime_dataset(paths: PipelinePaths) -> Dataset:
         interactions_df=interactions,
         targets_df=base_dataset.targets_df,
         catalog_df=base_dataset.catalog_df,
+        authors_df=base_dataset.authors_df,
         book_genres_df=base_dataset.book_genres_df,
         genres_df=base_dataset.genres_df,
         users_df=base_dataset.users_df,

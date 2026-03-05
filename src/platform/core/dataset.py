@@ -19,6 +19,7 @@ class Dataset:
         interactions_df: Event log with `event_ts` parsed to datetime.
         targets_df: Users requiring top-k predictions.
         catalog_df: Edition metadata.
+        authors_df: Author dictionary.
         book_genres_df: Book to genre links.
         genres_df: Genre dictionary.
         users_df: User profile table.
@@ -28,6 +29,7 @@ class Dataset:
     interactions_df: pd.DataFrame
     targets_df: pd.DataFrame
     catalog_df: pd.DataFrame
+    authors_df: pd.DataFrame
     book_genres_df: pd.DataFrame
     genres_df: pd.DataFrame
     users_df: pd.DataFrame
@@ -51,6 +53,7 @@ class Dataset:
             "interactions.csv": data_dir / "interactions.csv",
             "targets.csv": data_dir / "targets.csv",
             "editions.csv": data_dir / "editions.csv",
+            "authors.csv": data_dir / "authors.csv",
             "book_genres.csv": data_dir / "book_genres.csv",
             "genres.csv": data_dir / "genres.csv",
             "users.csv": data_dir / "users.csv",
@@ -64,6 +67,7 @@ class Dataset:
         interactions_df = read_csv(required_files["interactions.csv"])
         targets_df = read_csv(required_files["targets.csv"])
         editions_df = read_csv(required_files["editions.csv"])
+        authors_df = read_csv(required_files["authors.csv"])
         book_genres_df = read_csv(required_files["book_genres.csv"])
         genres_df = read_csv(required_files["genres.csv"])
         users_df = read_csv(required_files["users.csv"])
@@ -87,6 +91,7 @@ class Dataset:
             ],
             "editions.csv",
         )
+        ensure_columns(authors_df, ["author_id"], "authors.csv")
         ensure_columns(book_genres_df, ["book_id", "genre_id"], "book_genres.csv")
         ensure_columns(genres_df, ["genre_id"], "genres.csv")
 
@@ -105,6 +110,7 @@ class Dataset:
             ("edition_id", editions_df),
             ("book_id", editions_df),
             ("author_id", editions_df),
+            ("author_id", authors_df),
             ("publication_year", editions_df),
             ("age_restriction", editions_df),
             ("language_id", editions_df),
@@ -132,6 +138,7 @@ class Dataset:
                 "publisher_id": "int64",
             }
         )
+        authors_df = authors_df.astype({"author_id": "int64"})
         book_genres_df = book_genres_df.astype({"book_id": "int64", "genre_id": "int64"})
         genres_df = genres_df.astype({"genre_id": "int64"})
 
@@ -147,6 +154,7 @@ class Dataset:
             interactions_df=interactions_df,
             targets_df=targets_df,
             catalog_df=editions_df,
+            authors_df=authors_df,
             book_genres_df=book_genres_df,
             genres_df=genres_df,
             users_df=users_df,

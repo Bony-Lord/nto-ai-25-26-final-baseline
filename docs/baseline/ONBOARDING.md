@@ -49,8 +49,3 @@ raw CSV -> data_cache.parquet -> features.parquet -> candidates.parquet -> predi
 - `src/platform/pipeline/`
 - `src/platform/core/`
 - `src/platform/infra/`
-
-## Важные оговорки
-
-- В коде встречается namespace `src.competition.solution.*`, но физически solution-файлы лежат прямо в `src/competition/`.
-- Базовый запуск в этом репозитории описан через `uv`; актуальные команды собраны в [`SETUP.md`](./SETUP.md).

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from src.competition.solution.features import build_features_frame
+from src.competition.features import build_features_frame
 from src.platform.core.artifacts import atomic_write_dataframe
 from src.platform.pipeline.models import PipelineContext
 from src.platform.pipeline.runtime import load_runtime_dataset

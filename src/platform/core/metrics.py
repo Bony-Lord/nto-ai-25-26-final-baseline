@@ -36,11 +36,14 @@ def ndcg_at_k(predicted: list[int], relevant: set[int], k: int) -> float:
     return dcg / idcg if idcg > 0 else 0.0
 
 
-def summarize_ndcg(per_user_df: pd.DataFrame) -> MetricsSummary:
+def summarize_ndcg(
+    per_user_df: pd.DataFrame, score_column: str = "ndcg@20"
+) -> MetricsSummary:
     """Aggregate local-validation per-user scores into summary statistics.
 
     Args:
-        per_user_df: DataFrame with at least `ndcg@20` column.
+        per_user_df: DataFrame with per-user metric values.
+        score_column: Column name containing per-user NDCG values.
 
     Returns:
         `MetricsSummary` with mean and key quantiles for quick monitoring.
@@ -51,7 +54,9 @@ def summarize_ndcg(per_user_df: pd.DataFrame) -> MetricsSummary:
             quantiles={"q25": 0.0, "q50": 0.0, "q75": 0.0},
             per_user=per_user_df,
         )
-    scores = per_user_df["ndcg@20"]
+    if score_column not in per_user_df.columns:
+        raise ValueError(f"Missing score column: {score_column}")
+    scores = per_user_df[score_column]
     quantiles = {
         "q25": float(scores.quantile(0.25)),
         "q50": float(scores.quantile(0.50)),

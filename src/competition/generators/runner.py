@@ -8,7 +8,7 @@ from typing import Any
 import pandas as pd
 from tqdm import tqdm
 
-from src.competition.solution.generators.registry import build_generator
+from src.competition.generators.registry import build_generator
 from src.platform.core.dataset import Dataset
 
 

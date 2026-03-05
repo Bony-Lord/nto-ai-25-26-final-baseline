@@ -40,6 +40,14 @@ def test_pipeline_smoke(tmp_path: Path) -> None:
             {"edition_id": 14, "book_id": 104, "author_id": 1002, "publication_year": 2023, "age_restriction": 12, "language_id": 1, "publisher_id": 3, "title": "e", "description": "e"},
         ],
     )
+    _write_csv(
+        data_dir / "authors.csv",
+        [
+            {"author_id": 1000, "author_name": "author-a"},
+            {"author_id": 1001, "author_name": "author-b"},
+            {"author_id": 1002, "author_name": "author-c"},
+        ],
+    )
     _write_csv(data_dir / "book_genres.csv", [{"book_id": 100, "genre_id": 500}, {"book_id": 101, "genre_id": 501}, {"book_id": 102, "genre_id": 500}, {"book_id": 103, "genre_id": 501}, {"book_id": 104, "genre_id": 500}])
     _write_csv(data_dir / "genres.csv", [{"genre_id": 500, "genre_name": "x"}, {"genre_id": 501, "genre_name": "y"}])
     _write_csv(data_dir / "users.csv", [{"user_id": 1, "gender": 1, "age": 22}, {"user_id": 2, "gender": 2, "age": 25}])
@@ -98,6 +106,14 @@ def test_progress_metadata_and_skip_logs(tmp_path: Path) -> None:
             {"edition_id": 12, "book_id": 102, "author_id": 1000, "publication_year": 2022, "age_restriction": 12, "language_id": 1, "publisher_id": 2, "title": "c", "description": "c"},
             {"edition_id": 13, "book_id": 103, "author_id": 1002, "publication_year": 2023, "age_restriction": 12, "language_id": 1, "publisher_id": 3, "title": "d", "description": "d"},
             {"edition_id": 14, "book_id": 104, "author_id": 1002, "publication_year": 2023, "age_restriction": 12, "language_id": 1, "publisher_id": 3, "title": "e", "description": "e"},
+        ],
+    )
+    _write_csv(
+        data_dir / "authors.csv",
+        [
+            {"author_id": 1000, "author_name": "author-a"},
+            {"author_id": 1001, "author_name": "author-b"},
+            {"author_id": 1002, "author_name": "author-c"},
         ],
     )
     _write_csv(data_dir / "book_genres.csv", [{"book_id": 100, "genre_id": 500}, {"book_id": 101, "genre_id": 501}, {"book_id": 102, "genre_id": 500}, {"book_id": 103, "genre_id": 501}, {"book_id": 104, "genre_id": 500}])

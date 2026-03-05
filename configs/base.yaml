@@ -19,7 +19,6 @@ candidates:
         author_smoothing: 1.0
 
 ranking:
-  method: simple_blend
   source_weights:
     global_popularity: 1.0
     user_genre: 1.0

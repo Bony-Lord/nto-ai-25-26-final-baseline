@@ -6,7 +6,7 @@ from typing import Any
 
 import pandas as pd
 
-from src.competition.solution.validation import validate_submission
+from src.competition.validation import validate_submission
 from src.platform.core.artifacts import atomic_write_dataframe
 from src.platform.pipeline.models import PipelineContext
 

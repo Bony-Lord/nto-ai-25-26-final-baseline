@@ -7,7 +7,7 @@ from typing import Any
 
 import pandas as pd
 
-from src.competition.solution.generators import run_generators
+from src.competition.generators import run_generators
 from src.platform.core.artifacts import atomic_write_dataframe
 from src.platform.pipeline.models import PipelineContext
 from src.platform.pipeline.runtime import load_runtime_dataset

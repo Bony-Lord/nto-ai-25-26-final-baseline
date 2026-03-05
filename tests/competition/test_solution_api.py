@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.competition.solution.features import build_features_frame
-from src.competition.solution.generators import build_generator, run_generators
-from src.competition.solution.ranking import rank_predictions
+from src.competition.features import build_features_frame
+from src.competition.generators import build_generator, run_generators
+from src.competition.ranking import rank_predictions
 from src.platform.cli.config_loader import load_config
 from src.platform.core.dataset import Dataset
 
@@ -87,6 +87,13 @@ def _dataset() -> Dataset:
             {"book_id": 103, "genre_id": 501},
         ]
     )
+    authors = pd.DataFrame(
+        [
+            {"author_id": 1000, "author_name": "Author A"},
+            {"author_id": 1001, "author_name": "Author B"},
+            {"author_id": 1002, "author_name": "Author C"},
+        ]
+    )
     genres = pd.DataFrame({"genre_id": [500, 501], "genre_name": ["A", "B"]})
     users = pd.DataFrame({"user_id": [1, 2], "gender": [1, 2], "age": [20, 30]})
     seen = (
@@ -98,6 +105,7 @@ def _dataset() -> Dataset:
         interactions_df=interactions,
         targets_df=targets,
         catalog_df=catalog,
+        authors_df=authors,
         book_genres_df=book_genres,
         genres_df=genres,
         users_df=users,

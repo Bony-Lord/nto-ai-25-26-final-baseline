@@ -9,9 +9,9 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from src.competition.solution.features import build_features_frame
-from src.competition.solution.generators import run_generators
-from src.competition.solution.ranking import rank_predictions
+from src.competition.features import build_features_frame
+from src.competition.generators import run_generators
+from src.competition.ranking import rank_predictions
 from src.platform.core.dataset import Dataset
 from src.platform.core.metrics import ndcg_at_k, summarize_ndcg
 from src.platform.pipeline.models import PipelineContext
@@ -33,6 +33,8 @@ class PseudoIncidentValidationWorkflow:
             ValueError: If insufficient positive data exists for pseudo-incident.
         """
         dataset = Dataset.load(self.context.paths.data_dir)
+        k = int(self.context.config["pipeline"]["k"])
+        metric_label = f"ndcg@{k}"
         interactions = dataset.interactions_df.copy()
         positives = interactions[interactions["event_type"].isin([1, 2])]
         if positives.empty:
@@ -65,6 +67,7 @@ class PseudoIncidentValidationWorkflow:
             interactions_df=observed,
             targets_df=targets,
             catalog_df=dataset.catalog_df,
+            authors_df=dataset.authors_df,
             book_genres_df=dataset.book_genres_df,
             genres_df=dataset.genres_df,
             users_df=dataset.users_df,
@@ -91,7 +94,7 @@ class PseudoIncidentValidationWorkflow:
             dataset=validation_dataset,
             candidates=candidates,
             source_weights=self.context.config.get("ranking", {}).get("source_weights", {}),
-            k=int(self.context.config["pipeline"]["k"]),
+            k=k,
         )
 
         relevant_by_user: dict[int, set[int]] = {}
@@ -115,14 +118,14 @@ class PseudoIncidentValidationWorkflow:
             ndcg = ndcg_at_k(
                 predicted=predicted,
                 relevant=relevant,
-                k=int(self.context.config["pipeline"]["k"]),
+                k=k,
             )
-            per_user_rows.append({"user_id": int(user_id), "ndcg@20": ndcg})
+            per_user_rows.append({"user_id": int(user_id), metric_label: ndcg})
 
         per_user_df = pd.DataFrame(per_user_rows)
-        summary = summarize_ndcg(per_user_df)
+        summary = summarize_ndcg(per_user_df, score_column=metric_label)
         result = {
-            "mean_ndcg@20": summary.mean_ndcg,
+            f"mean_{metric_label}": summary.mean_ndcg,
             "quantiles": summary.quantiles,
             "users": int(len(per_user_df)),
         }

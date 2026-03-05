@@ -19,7 +19,7 @@ class UserGenrePopularityGenerator:
     Smoothing keeps long-tail genres from collapsing to zeros in sparse cases.
     """
 
-    name = "user_genre_popularity"
+    name = "user_genre"
 
     def __init__(self, genre_smoothing: float = 1.0, show_progress: bool = False) -> None:
         """Store hyperparameters controlling user-genre scoring.

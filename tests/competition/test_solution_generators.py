@@ -4,9 +4,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.competition.solution.generators.global_popularity import GlobalPopularityGenerator
-from src.competition.solution.generators.user_author import UserAuthorGenerator
-from src.competition.solution.generators.user_genre import UserGenrePopularityGenerator
+from src.competition.generators.global_popularity import GlobalPopularityGenerator
+from src.competition.generators.user_author import UserAuthorGenerator
+from src.competition.generators.user_genre import UserGenrePopularityGenerator
 from src.platform.core.dataset import Dataset
 
 
@@ -35,6 +35,12 @@ def sample_dataset() -> Dataset:
             {"book_id": 102, "genre_id": 500},
         ]
     )
+    authors = pd.DataFrame(
+        [
+            {"author_id": 1000, "author_name": "Author A"},
+            {"author_id": 1001, "author_name": "Author B"},
+        ]
+    )
     genres = pd.DataFrame({"genre_id": [500, 501], "genre_name": ["A", "B"]})
     users = pd.DataFrame({"user_id": [1, 2], "gender": [1, 2], "age": [20, 30]})
     seen = interactions[interactions["event_type"].isin([1, 2])][["user_id", "edition_id"]].drop_duplicates()
@@ -42,6 +48,7 @@ def sample_dataset() -> Dataset:
         interactions_df=interactions,
         targets_df=targets,
         catalog_df=catalog,
+        authors_df=authors,
         book_genres_df=book_genres,
         genres_df=genres,
         users_df=users,
