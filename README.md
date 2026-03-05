@@ -4,19 +4,27 @@
 
 Baseline уже содержит воспроизводимый пайплайн, локальную валидацию, контракты данных и формат сабмита. При этом он намеренно оставлен достаточно простым: наша цель не в том, чтобы дать вам “почти готовое решение”, а в том, чтобы дать удобную рамку для быстрых экспериментов и интеграции новых идей.
 
+Проект можно запустить одной командой прямо сейчас:
+
+```bash
+uv run python -m src.platform.cli.entrypoint run --config configs/experiments/baseline.yaml
+```
+
 ## Что стоит прочитать в первую очередь
 
 Да, мы просим вас не бросаться в разработку в первые секунды, а почитать то, что вам даётся. Вы уделите 20 минут своего времени, но сэкономите 4ч на дебаг. 
 
 За уточнениями вы можете обратиться к менторам, кейсодержателю или GPT.
 
-- [`docs/baseline/SETUP.md`](docs/baseline/SETUP.md) — как запускать пайплайн и где смотреть артефакты
-- [`docs/baseline/ONBOARDING.md`](docs/baseline/ONBOARDING.md) — общая карта baseline
-- [`src/competition/README.md`](src/competition/README.md) — куда чаще всего стоит вносить изменения
-- [`src/platform/README.md`](src/platform/README.md) — как устроен infrastructure-слой
-- [`docs/task/task_description.md`](docs/task/task_description.md) — постановка задачи и метрика
-- [`docs/task/data_description.md`](docs/task/data_description.md) — схема данных
-- [`notebooks/EDA.ipynb`](notebooks/EDA.ipynb) — очень простой обзор объекта `Dataset` и доступных таблиц
+| Документ | Зачем читать |
+|---|---|
+| [`docs/baseline/SETUP.md`](docs/baseline/SETUP.md) | Как запускать пайплайн и где смотреть артефакты |
+| [`docs/baseline/ONBOARDING.md`](docs/baseline/ONBOARDING.md) | Общая карта baseline |
+| [`src/competition/README.md`](src/competition/README.md) | Куда чаще всего стоит вносить изменения |
+| [`src/platform/README.md`](src/platform/README.md) | Как устроен infrastructure-слой |
+| [`docs/task/task_description.md`](docs/task/task_description.md) | Постановка задачи и метрика |
+| [`docs/task/data_description.md`](docs/task/data_description.md) | Схема данных |
+| [`notebooks/EDA.ipynb`](notebooks/EDA.ipynb) | Очень простой обзор объекта `Dataset` и доступных таблиц |
 
 ## Что уже реализовано в baseline
 
