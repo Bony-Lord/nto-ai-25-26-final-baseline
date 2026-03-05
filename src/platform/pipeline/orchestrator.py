@@ -72,6 +72,10 @@ class PipelineRunner:
             data_cache_path=artifacts_dir / "data_cache.parquet",
             features_path=artifacts_dir / "features.parquet",
             candidates_path=artifacts_dir / "candidates.parquet",
+            generators_cache_dir=artifacts_dir / "generators",
+            generators_cache_manifest_path=artifacts_dir
+            / "_meta"
+            / "generator_cache_manifest.json",
             predictions_path=artifacts_dir / "predictions.parquet",
             submission_path=artifacts_dir / "submission.csv",
         )

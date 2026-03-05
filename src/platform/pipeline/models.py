@@ -44,6 +44,8 @@ class PipelinePaths:
     data_cache_path: Path
     features_path: Path
     candidates_path: Path
+    generators_cache_dir: Path
+    generators_cache_manifest_path: Path
     predictions_path: Path
     submission_path: Path
 
