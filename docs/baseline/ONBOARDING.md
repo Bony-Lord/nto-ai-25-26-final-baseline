@@ -99,14 +99,28 @@ candidates:
 - `uv run pytest -q`
 - `uv run python -m src.platform.cli.entrypoint run --config configs/experiments/<your_exp>.yaml --stage generate_candidates`
 
-## 5) Быстрый checklist перед экспериментом
+## 5) Мини-гайд: улучшить ранкер
+
+- Базовый ранкер находится в `src/competition/solution/ranking.py`.
+- Самый быстрый путь улучшений без риска:
+  1. начать с настройки `ranking.source_weights` в `configs/experiments/*.yaml`;
+  2. затем доработать `SimpleBlendRanker` (например, другой blending, tie-break, fallback);
+  3. при необходимости добавить свой ранкер и вызывать его из `rank_predictions(...)`.
+- Техническую стадию `src/platform/pipeline/stages/rank_and_select.py` обычно менять не нужно: она только делегирует вызов в participant-ранжирование.
+
+Минимальная проверка после изменений ранкера:
+- `uv run pytest -q`
+- `uv run python -m src.platform.cli.entrypoint run --config configs/experiments/<your_exp>.yaml --stage rank_and_select`
+- `uv run python -m src.platform.cli.entrypoint validate --config configs/experiments/<your_exp>.yaml`
+
+## 6) Быстрый checklist перед экспериментом
 
 - Изменения ограничены генераторами и конфигом.
 - Контракт генератора не нарушен.
 - Сабмит проходит строгую валидацию.
 - Повторный запуск корректно использует cache-hit.
 
-## 6) Что делать, если мало времени
+## 7) Что делать, если мало времени
 
 1. Не трогать ядро пайплайна.
 2. Добавить 1-2 сильных генератора.
