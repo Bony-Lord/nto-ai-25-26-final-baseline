@@ -25,24 +25,24 @@ data/
 Полный прогон:
 
 ```bash
-uv run python -m src.cli run --config configs/experiments/baseline.yaml
+uv run python -m src.platform.cli.entrypoint run --config configs/experiments/baseline.yaml
 ```
 
 Перезапуск с конкретной стадии (с автодогоном зависимостей):
 
 ```bash
-uv run python -m src.cli run --config configs/experiments/baseline.yaml --stage generate_candidates
+uv run python -m src.platform.cli.entrypoint run --config configs/experiments/baseline.yaml --stage generate_candidates
 ```
 
 Локальная валидация (псевдо-инцидент):
 
 ```bash
-uv run python -m src.cli validate --config configs/experiments/baseline.yaml
+uv run python -m src.platform.cli.entrypoint validate --config configs/experiments/baseline.yaml
 ```
 
 ## CLI: команды и опции
 
-Точка входа: `python -m src.cli`
+Точка входа: `python -m src.platform.cli.entrypoint`
 
 - `run`
   - `--config` (по умолчанию `configs/base.yaml`; рекомендуемый — `configs/experiments/baseline.yaml`)

@@ -4,10 +4,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.candidates.global_popularity import GlobalPopularityGenerator
-from src.candidates.user_author import UserAuthorGenerator
-from src.candidates.user_genre_popularity import UserGenrePopularityGenerator
-from src.core.dataset import Dataset
+from src.competition.solution.generators.global_popularity import GlobalPopularityGenerator
+from src.competition.solution.generators.user_author import UserAuthorGenerator
+from src.competition.solution.generators.user_genre import UserGenrePopularityGenerator
+from src.platform.core.dataset import Dataset
 
 
 @pytest.fixture

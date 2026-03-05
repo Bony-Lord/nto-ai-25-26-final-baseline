@@ -14,7 +14,7 @@
 
 1. Подготовьте данные в `data/` (см. [`SETUP.md`](SETUP.md)).
 2. Запустите полный пайплайн:
-   `uv run python -m src.cli run --config configs/experiments/baseline.yaml`
+   `uv run python -m src.platform.cli.entrypoint run --config configs/experiments/baseline.yaml`
 3. Проверьте результат: `artifacts/submission.csv`.
 
 ## Что читать дальше
@@ -25,17 +25,17 @@
 
 ## Что в репозитории важно
 
-- `src/participants/` — участковая зона (features/generators/ranking/validation).
-- `src/candidates/` — реализации генераторов кандидатов.
+- `src/competition/solution/` — участковая зона (features/generators/ranking/validation).
 - `configs/experiments/` — конфиги экспериментов участника.
-- `src/pipeline/` — оркестрация и стадии (техническое ядро).
-- `src/core/` — кэширование, валидация контракта, логирование.
+- `src/platform/pipeline/` — оркестрация и стадии (техническое ядро).
+- `src/platform/core/` — кэширование, валидация контракта, логирование.
+- `src/platform/infra/` — инфраструктурные IO/utility-компоненты.
 
 ## Что лучше не трогать и не тратить время
 
-- Не переписывайте логику кэширования и атомарной записи в `src/core/artifacts.py` и `src/io/hashing.py` без реальной необходимости.
-- Не меняйте контракт итогового сабмита в `src/core/validate.py`.
-- Не рефакторьте `src/pipeline/` ради улучшения метрики: используйте `src/participants/` и `configs/experiments/*.yaml`.
+- Не переписывайте логику кэширования и атомарной записи в `src/platform/core/artifacts.py` и `src/platform/infra/hashing.py` без реальной необходимости.
+- Не меняйте контракт итогового сабмита в `src/platform/core/submission_contract.py`.
+- Не рефакторьте `src/platform/` ради улучшения метрики: используйте `src/competition/solution/` и `configs/experiments/*.yaml`.
 - Не тратьте время на сложный ML “с нуля” в самом начале: сначала выжмите максимум из candidate generation + blending/weights.
 
 ## Что делать дальше

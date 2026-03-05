@@ -4,11 +4,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.cli import load_config
-from src.core.dataset import Dataset
-from src.participants.features import build_features_frame
-from src.participants.generators import build_generator, run_generators
-from src.participants.ranking import rank_predictions
+from src.competition.solution.features import build_features_frame
+from src.competition.solution.generators import build_generator, run_generators
+from src.competition.solution.ranking import rank_predictions
+from src.platform.cli.config_loader import load_config
+from src.platform.core.dataset import Dataset
 
 
 def _dataset() -> Dataset:

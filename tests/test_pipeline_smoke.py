@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.pipeline import PipelineRunner
-from src.core.artifacts import ArtifactsManager
+from src.platform.core.artifacts import ArtifactsManager
+from src.platform.pipeline import PipelineRunner
 
 
 def _write_csv(path: Path, rows: list[dict]) -> None:

@@ -4,19 +4,18 @@
 
 ## 1) Карта baseline
 
-- `src/participants/` — главная зона участника (features/generators/ranking/validation).
-- `src/candidates/` — реализации генераторов кандидатов.
+- `src/competition/solution/` — главная зона участника (features/generators/ranking/validation).
 - `configs/experiments/` — конфиги экспериментов.
-- `src/pipeline/orchestrator.py` и `src/pipeline/stages/` — техническая оркестрация.
-- `src/pipeline/workflows/local_validation.py` — `PseudoIncidentValidationWorkflow`.
-- `src/core/validate.py` — строгая проверка формата `submission.csv`.
+- `src/platform/pipeline/orchestrator.py` и `src/platform/pipeline/stages/` — техническая оркестрация.
+- `src/platform/pipeline/workflows/local_validation.py` — `PseudoIncidentValidationWorkflow`.
+- `src/platform/core/submission_contract.py` — строгая проверка формата `submission.csv`.
 - `configs/system.yaml` — системные параметры (пути, логи).
 - `tests/` — минимальные тесты контрактов и smoke-сценарий.
 
 ## 2) Что менять в первую очередь (high impact)
 
-1. **Новые генераторы кандидатов** в `src/candidates/`.
-2. **Регистрация генераторов** в `src/participants/generators/registry.py`.
+1. **Новые генераторы кандидатов** в `src/competition/solution/generators/`.
+2. **Регистрация генераторов** в `src/competition/solution/generators/registry.py`.
 3. **Параметры эксперимента** в `configs/experiments/*.yaml`.
 4. **Весы источников** в `ranking.source_weights`.
 5. **Ширина кандидатов**: `candidates.per_generator_k`.
@@ -25,9 +24,9 @@
 
 ## 3) Куда не лезть сначала
 
-- Механизм кэширования и атомарной записи (`src/core/artifacts.py`, `src/io/hashing.py`).
-- Контракт итогового сабмита и его валидация (`src/core/validate.py`).
-- Базовая схема оркестрации и стадий в `src/pipeline/`, если нет явной причины.
+- Механизм кэширования и атомарной записи (`src/platform/core/artifacts.py`, `src/platform/infra/hashing.py`).
+- Контракт итогового сабмита и его валидация (`src/platform/core/submission_contract.py`).
+- Базовая схема оркестрации и стадий в `src/platform/pipeline/`, если нет явной причины.
 
 Причина: эти части отвечают за стабильность и воспроизводимость baseline.
 
@@ -35,7 +34,7 @@
 
 ### Шаг 1. Создать файл генератора
 
-Пример `src/candidates/my_generator.py`:
+Пример `src/competition/solution/generators/my_generator.py`:
 
 ```python
 from __future__ import annotations
@@ -43,7 +42,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from src.core.dataset import Dataset
+from src.platform.core.dataset import Dataset
 
 
 class MyGenerator:
@@ -67,7 +66,7 @@ class MyGenerator:
 
 ### Шаг 2. Зарегистрировать генератор
 
-Добавить его в реестр `src/participants/generators/registry.py`:
+Добавить его в реестр `src/competition/solution/generators/registry.py`:
 
 ```python
 GENERATOR_REGISTRY["my_generator"] = (
@@ -98,7 +97,7 @@ candidates:
 ### Шаг 5. Прогнать тесты и запуск
 
 - `uv run pytest -q`
-- `uv run python -m src.cli run --config configs/experiments/<your_exp>.yaml --stage generate_candidates`
+- `uv run python -m src.platform.cli.entrypoint run --config configs/experiments/<your_exp>.yaml --stage generate_candidates`
 
 ## 5) Быстрый checklist перед экспериментом
 
