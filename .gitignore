@@ -12,3 +12,13 @@ data/
 docs/baseline_description.md
 catboost_info/
 outputs/
+
+# Project specific
+artifacts/
+logs/
+configs/
+
+# IDEs
+.vscode/
+.idea/
+*.swp

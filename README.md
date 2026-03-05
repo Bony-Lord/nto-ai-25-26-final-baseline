@@ -1,33 +1,55 @@
-# Readme
+# Baseline Pipeline (ADR-001)
 
-Данный файл будет изменён для участников исходя из их контура (ods.ai)
+Бейзлайн реализован как модульный офлайн-пайплайн из 5 стадий:
+`prepare_data -> build_features -> generate_candidates -> rank_and_select -> make_submission`.
 
-## Data
+## Данные
 
-Скачать данные можно по ссылке https://drive.google.com/drive/folders/1GFVD5JLTRxiZzEohcVqJPX6nVOOqwuyx?usp=drive_link
+Ожидаемая структура `data/`:
 
-Данные из `participants/` необходимо положить в `data/`
-Данные из `platform/` не являются обязательными, только если что-то хочется проверить относительно ground-truth.
-
-Итого получается так:
-
+```text
+data/
+  interactions.csv
+  targets.csv
+  editions.csv
+  authors.csv
+  genres.csv
+  book_genres.csv
+  users.csv
 ```
-❯ ls data/
-authors.csv  book_genres.csv  editions.csv  genres.csv  interactions.csv  platform  sample_submission.csv  targets.csv  users.csv
+
+## Запуск (сценарий 1)
+
+```bash
+uv run python -m src.cli run --config configs/base.yaml
 ```
 
-## Summary of Baseline
+Результат:
+- создаются артефакты в `artifacts/`
+- итоговый файл `artifacts/submission.csv`
 
-- Бейзлайн построен как двухэтапный пайплайн рекомендаций: сначала генерация кандидатов (popularity + content + item-to-item co-occurrence), затем pointwise ранжирование кандидатов через `CatBoostClassifier`.
-- Локальная валидация реализована через masking позитивных взаимодействий: часть позитивов скрывается, модель обучается на наблюдаемой истории и оценивается по качеству восстановления скрытых объектов (NDCG@20 + диагностика candidate recall).
-- Технологический стек: `Python`, `pandas`/`numpy` для табличной обработки и фичей, `CatBoost` для ранжирования, `tqdm`/`matplotlib` для диагностики, checkpoint/cache-логика для ускорения перезапусков и воспроизводимый экспорт `submission.csv` по контракту (20 уникальных `edition_id` на пользователя).
+## Перезапуск конкретного шага (сценарий 2)
 
-## Expert task
+```bash
+uv run python -m src.cli run --config configs/base.yaml --stage generate_candidates
+```
 
-На самом деле вам виднее, что необходимо проверить, но минимально:
-1. Описание данных
-2. Применимость бейзлайна
+Поведение:
+- будут выполнены зависимости выбранной стадии
+- готовые стадии с совпадающим fingerprint пропускаются
 
-Так как у участников будет всего 2 дня на решение, то постарался сделать бейзлайн масштабируемым и не особо слабым. Если считаете, что слишком слабый/слишком сильный/что-то некорректно применено -- давайте обсудим. Это наверное самое спорное и неоднозначное в задаче.
+## Локальная валидация (сценарий 3)
 
-Описание находится в `docs/task.md`, описание данных в `docs/data_description.md`
+```bash
+uv run python -m src.cli validate --config configs/base.yaml
+```
+
+Вывод:
+- `mean_ndcg@20`
+- квантили (`q25`, `q50`, `q75`)
+
+## Примечания
+
+- Логи запуска пишутся в `logs/`.
+- Метаданные кэша шагов пишутся в `artifacts/_meta/`.
+- При любой записи артефактов используется атомарный `os.replace`.
