@@ -1,4 +1,4 @@
-"""Ranking logic for participant solution outputs."""
+"""Ranking logic for participant solution."""
 
 from __future__ import annotations
 
@@ -8,39 +8,21 @@ from src.platform.core.dataset import Dataset
 
 
 class SimpleBlendRanker:
-    """Blend sources with weighted scores and enforce top-k per user.
-
-    The ranker combines candidate sources by weighted max aggregation, filters
-    already seen positives, and fills missing slots with global-popularity
-    fallback to preserve a valid submission shape for every target user.
-    """
+    """Blend candidate sources with robust per-source normalization."""
 
     def __init__(self, source_weights: dict[str, float] | None = None) -> None:
-        """Capture source-level blend multipliers from experiment config.
-
-        Args:
-            source_weights: Optional mapping from source name to multiplicative
-                score weight. Missing sources default to weight 1.0.
-        """
         self.source_weights = source_weights or {}
 
     def _apply_weights(self, candidates: pd.DataFrame) -> pd.DataFrame:
         weighted = candidates.copy()
         weighted["weight"] = weighted["source"].map(self.source_weights).fillna(1.0)
-        weighted["final_score"] = weighted["score"] * weighted["weight"]
+
+        source_max = weighted.groupby("source")["score"].transform("max").replace(0.0, 1.0)
+        weighted["score_norm"] = weighted["score"] / source_max
+        weighted["final_score"] = weighted["score_norm"] * weighted["weight"]
         return weighted
 
     def rank(self, dataset: Dataset, candidates: pd.DataFrame, k: int) -> pd.DataFrame:
-        """Rank candidates and produce exactly top-k rows per user.
-
-        Args:
-            dataset: Runtime dataset with targets and seen-positive pairs.
-            candidates: Candidate frame merged across generator sources.
-            k: Required output cutoff per user.
-
-        Returns:
-            DataFrame with `user_id`, `edition_id`, `rank`, `final_score`.
-        """
         if candidates.empty:
             return self._fallback_only(dataset, k)
 
@@ -56,8 +38,12 @@ class SimpleBlendRanker:
 
         filtered = self._apply_weights(filtered)
         blended = (
-            filtered.groupby(["user_id", "edition_id"], as_index=False)["final_score"]
-            .max()
+            filtered.groupby(["user_id", "edition_id"], as_index=False)
+            .agg(
+                final_score=("final_score", "sum"),
+                source_count=("source", "nunique"),
+            )
+            .assign(final_score=lambda x: x["final_score"] + 0.03 * x["source_count"])
             .sort_values(["user_id", "final_score", "edition_id"], ascending=[True, False, True])
         )
 
@@ -100,12 +86,7 @@ class SimpleBlendRanker:
                     break
         return pd.DataFrame(rows)
 
-    def _apply_fallback(
-        self,
-        selected: pd.DataFrame,
-        dataset: Dataset,
-        k: int,
-    ) -> pd.DataFrame:
+    def _apply_fallback(self, selected: pd.DataFrame, dataset: Dataset, k: int) -> pd.DataFrame:
         positives = dataset.interactions_df[dataset.interactions_df["event_type"].isin([1, 2])]
         popularity = (
             positives.groupby("edition_id", as_index=False)["user_id"]
@@ -154,19 +135,7 @@ def rank_predictions(
     source_weights: dict[str, float],
     k: int,
 ) -> pd.DataFrame:
-    """Rank candidate set using configured blend strategy.
-
-    Args:
-        dataset: Runtime dataset for filtering and fallback behavior.
-        candidates: Candidate rows emitted by all generators.
-        source_weights: Source weights configured for blending.
-        k: Required cutoff for returned top list.
-
-    Returns:
-        Ranked DataFrame with `user_id`, `edition_id`, `rank`, `final_score`.
-    """
     ranker = SimpleBlendRanker(
         source_weights={key: float(value) for key, value in source_weights.items()}
     )
     return ranker.rank(dataset=dataset, candidates=candidates, k=int(k))
-

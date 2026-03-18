@@ -83,6 +83,42 @@ def build_features_frame(dataset: Dataset, recent_days: int) -> pd.DataFrame:
     user_author_profile["edition_id"] = pd.NA
     user_author_profile["genre_id"] = pd.NA
 
+    user_languages = positives[["user_id", "edition_id"]].merge(
+        dataset.catalog_df[["edition_id", "language_id"]],
+        on="edition_id",
+        how="inner",
+    )
+    user_language_profile = (
+        user_languages.groupby(["user_id", "language_id"], as_index=False)["edition_id"]
+        .count()
+        .rename(columns={"edition_id": "value"})
+    )
+    user_language_profile["value"] = user_language_profile["value"] / user_language_profile.groupby(
+        "user_id"
+    )["value"].transform("sum")
+    user_language_profile["feature_type"] = "user_language_profile"
+    user_language_profile["genre_id"] = user_language_profile["language_id"]
+    user_language_profile["edition_id"] = pd.NA
+    user_language_profile["author_id"] = pd.NA
+
+    user_publishers = positives[["user_id", "edition_id"]].merge(
+        dataset.catalog_df[["edition_id", "publisher_id"]],
+        on="edition_id",
+        how="inner",
+    )
+    user_publisher_profile = (
+        user_publishers.groupby(["user_id", "publisher_id"], as_index=False)["edition_id"]
+        .count()
+        .rename(columns={"edition_id": "value"})
+    )
+    user_publisher_profile["value"] = user_publisher_profile["value"] / user_publisher_profile.groupby(
+        "user_id"
+    )["value"].transform("sum")
+    user_publisher_profile["feature_type"] = "user_publisher_profile"
+    user_publisher_profile["genre_id"] = user_publisher_profile["publisher_id"]
+    user_publisher_profile["edition_id"] = pd.NA
+    user_publisher_profile["author_id"] = pd.NA
+
     return pd.concat(
         [
             popularity_all[
@@ -97,7 +133,12 @@ def build_features_frame(dataset: Dataset, recent_days: int) -> pd.DataFrame:
             user_author_profile[
                 ["feature_type", "user_id", "edition_id", "genre_id", "author_id", "value"]
             ],
+            user_language_profile[
+                ["feature_type", "user_id", "edition_id", "genre_id", "author_id", "value"]
+            ],
+            user_publisher_profile[
+                ["feature_type", "user_id", "edition_id", "genre_id", "author_id", "value"]
+            ],
         ],
         ignore_index=True,
     )
-
